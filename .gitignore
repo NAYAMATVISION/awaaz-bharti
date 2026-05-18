@@ -1,0 +1,63 @@
+# ========================
+# Dependencies
+# ========================
+node_modules/
+**/node_modules/
+
+# ========================
+# Next.js
+# ========================
+awaaz-bharti/.next/
+awaaz-bharti/out/
+
+# ========================
+# Environment files
+# ========================
+.env
+.env.local
+.env.production
+.env.development
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development
+
+# ========================
+# Uploads (user-generated files)
+# ========================
+server/uploads/
+
+# ========================
+# Build / dist
+# ========================
+dist/
+build/
+
+# ========================
+# Logs
+# ========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ========================
+# VSCode
+# ========================
+.vscode/
+
+# ========================
+# Misc
+# ========================
+*.pem
+.vercel
+*.tsbuildinfo
+next-env.d.ts

@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Ticker scroll animation */
+@keyframes scroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .ticker-wrapper:hover .ticker-track {
+    animation-play-state: paused;
+  }
+  .ticker-track {
+    animation: scroll 23s linear infinite;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Base typography */
+body {
+  font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
