@@ -12,12 +12,23 @@ export default function EPaperPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     fetch(`${apiUrl}/api/epaper`)
       .then(res => res.json())
-      .then(data => {
-        if (data.success) setEpaper(data.data);
-      })
+      .then(data => { if (data.success) setEpaper(data.data); })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
   }, []);
+
+  // Convert any Google Drive URL format to embed/preview URL
+  const getEmbedUrl = (url) => {
+    if (!url) return null;
+    const match = url.match(/[-\w]{25,}/);
+    if (match) return `https://drive.google.com/file/d/${match[0]}/preview`;
+    return url; // return as-is if not a Drive URL
+  };
+
+  const embedUrl = epaper ? getEmbedUrl(epaper.fileUrl) : null;
+
+  // Direct open URL (view instead of preview)
+  const openUrl = epaper?.fileUrl?.replace('/preview', '/view') || epaper?.fileUrl;
 
   return (
     <div className="bg-slate-50 min-h-screen flex flex-col">
@@ -52,7 +63,7 @@ export default function EPaperPage() {
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <span className="font-bold text-gray-900">{epaper.title}</span>
               <a
-                href={epaper.fileUrl}
+                href={openUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-1.5 bg-red-700 text-white text-xs font-black rounded-full hover:bg-red-800 transition-all uppercase tracking-widest"
@@ -61,12 +72,11 @@ export default function EPaperPage() {
               </a>
             </div>
             <iframe
-              src={epaper.fileUrl}
+              src={embedUrl}
               width="100%"
-              height="90vh"
-              style={{ height: '90vh' }}
-              className="rounded-b-2xl border-0"
+              style={{ height: '90vh', border: 'none' }}
               title={epaper.title}
+              allow="autoplay"
             />
           </div>
         )}

@@ -10,7 +10,7 @@ export default function AdminDashboard() {
   const { user, loading, logout } = useAuthContext();
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
-  const [epaperFile, setEpaperFile] = useState(null);
+  const [epaperUrl, setEpaperUrl] = useState('');
   const [epaperTitle, setEpaperTitle] = useState('');
   const [epaperUploading, setEpaperUploading] = useState(false);
   const [epaperMsg, setEpaperMsg] = useState('');
@@ -174,32 +174,37 @@ export default function AdminDashboard() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                if (!epaperFile) return;
+                if (!epaperUrl.trim()) return;
                 setEpaperUploading(true);
                 setEpaperMsg('');
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
                 const token = localStorage.getItem('token');
-                const formData = new FormData();
-                formData.append('pdf', epaperFile);
-                formData.append('title', epaperTitle || `E-Paper ${new Date().toLocaleDateString('en-IN')}`);
+                // Convert Google Drive share URL to embed URL
+                const fileId = epaperUrl.match(/[-\w]{25,}/)?.[0];
+                const embedUrl = fileId
+                  ? `https://drive.google.com/file/d/${fileId}/preview`
+                  : epaperUrl;
                 try {
                   const res = await fetch(`${apiUrl}/api/epaper`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                      title: epaperTitle || `E-Paper ${new Date().toLocaleDateString('en-IN')}`,
+                      fileUrl: embedUrl,
+                    }),
                   });
                   const data = await res.json();
-                  setEpaperMsg(data.success ? 'E-paper updated successfully' : (data.message || 'Upload failed'));
-                  if (data.success) { setEpaperFile(null); setEpaperTitle(''); e.target.reset(); }
+                  setEpaperMsg(data.success ? 'E-paper updated successfully' : (data.message || 'Failed'));
+                  if (data.success) { setEpaperUrl(''); setEpaperTitle(''); }
                 } catch {
-                  setEpaperMsg('Upload failed. Please try again.');
+                  setEpaperMsg('Failed. Please try again.');
                 } finally {
                   setEpaperUploading(false);
                 }
               }}
-              className="flex flex-col sm:flex-row gap-4 items-start sm:items-end"
+              className="flex flex-col gap-4"
             >
-              <div className="flex flex-col gap-1.5 flex-1">
+              <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-black uppercase text-slate-400 tracking-widest">Title (optional)</label>
                 <input
                   type="text"
@@ -209,22 +214,24 @@ export default function AdminDashboard() {
                   className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-700 transition-all"
                 />
               </div>
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-xs font-black uppercase text-slate-400 tracking-widest">PDF File</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-black uppercase text-slate-400 tracking-widest">Google Drive PDF Link</label>
                 <input
-                  type="file"
-                  accept="application/pdf"
+                  type="url"
                   required
-                  onChange={e => setEpaperFile(e.target.files[0])}
-                  className="border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-red-700 transition-all file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                  placeholder="https://drive.google.com/file/d/FILE_ID/view"
+                  value={epaperUrl}
+                  onChange={e => setEpaperUrl(e.target.value)}
+                  className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-700 transition-all"
                 />
+                <p className="text-[11px] text-slate-400">Upload PDF to Google Drive → Share → Copy link → Paste here</p>
               </div>
               <button
                 type="submit"
-                disabled={epaperUploading || !epaperFile}
-                className="px-6 py-2.5 bg-red-700 text-white font-black rounded-xl hover:bg-red-800 transition-all uppercase text-xs tracking-widest shadow-lg shadow-red-700/20 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                disabled={epaperUploading || !epaperUrl.trim()}
+                className="px-6 py-2.5 bg-red-700 text-white font-black rounded-xl hover:bg-red-800 transition-all uppercase text-xs tracking-widest shadow-lg shadow-red-700/20 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
               >
-                {epaperUploading ? 'Uploading...' : 'Upload E-Paper'}
+                {epaperUploading ? 'Saving...' : 'Update E-Paper'}
               </button>
             </form>
             {epaperMsg && (

@@ -4,6 +4,7 @@ const epaperSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     fileUrl: { type: String, required: true },
+    cloudinaryId: { type: String, default: '' },
   },
   { timestamps: true }
 );

@@ -12,7 +12,9 @@ import { getImageUrl } from "../lib/utils";
 async function getData(endpoint) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
   try {
-    const res = await fetch(`${baseUrl}${endpoint}`, { cache: 'no-store' });
+    const res = await fetch(`${baseUrl}${endpoint}`, {
+      next: { revalidate: 60 }, // cache for 60s, revalidate in background
+    });
     const result = await res.json();
     return result.success ? result.data : null;
   } catch (error) {
@@ -86,7 +88,10 @@ export default async function HomePage() {
             {heroArticle ? (
               <HeroSection featured={heroArticle} />
             ) : (
-              <div className="py-20 text-center text-gray-500">Loading latest news...</div>
+              <div className="min-h-[420px] bg-white rounded-xl flex flex-col items-center justify-center gap-3 border border-slate-100 shadow-sm">
+                <div className="text-5xl">📰</div>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No articles available</p>
+              </div>
             )}
 
             <LiveUpdates updates={mappedLive} />

@@ -46,6 +46,9 @@ export default function VideoSection({ videos }) {
       </div>
 
       {/* Carousel */}
+      {videos.length === 0 ? (
+        <p className="text-[12px] text-slate-400 italic py-3">No videos available right now.</p>
+      ) : (
       <div
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pl-1 py-2 pb-3 scrollbar-hide"
@@ -90,6 +93,7 @@ export default function VideoSection({ videos }) {
           );
         })}
       </div>
+      )}
     </section>
   );
 }
