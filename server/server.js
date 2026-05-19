@@ -38,12 +38,27 @@ app.use('/uploads', express.static('uploads'));
 // Middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    process.env.FRONTEND_URL,
-  ].filter(Boolean),
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
+    if (allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins in production until domain is stable
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 app.use(express.json());
 
 // Routes
