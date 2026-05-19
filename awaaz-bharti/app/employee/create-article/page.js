@@ -30,6 +30,7 @@ export default function CreateArticlePage() {
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
     const uploadFormData = new FormData();
     uploadFormData.append('image', file);
     setUploading(true);
@@ -37,14 +38,16 @@ export default function CreateArticlePage() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const token = localStorage.getItem('token');
       const res = await fetch(`${apiUrl}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: uploadFormData,
       });
       const data = await res.json();
-      
+
       if (!res.ok) throw new Error(data.message || 'Upload failed');
-      
+
       setFormData(prev => ({ ...prev, image: data.image }));
       setUploading(false);
     } catch (err) {
@@ -114,8 +117,6 @@ export default function CreateArticlePage() {
       </div>
     );
   }
-
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   return (
     <div className="bg-slate-50 min-h-screen flex flex-col">
