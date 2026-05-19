@@ -60,7 +60,7 @@ export default function VideoSection({ videos }) {
           return (
             <article
               key={i}
-              className="snap-start min-w-[260px] max-w-[260px] flex-shrink-0 bg-white rounded-xl overflow-hidden shadow-sm border border-black/[.04] transition-all duration-300 hover:shadow-md hover:-translate-y-1 flex flex-col"
+              className="snap-start min-w-[240px] max-w-[240px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0 bg-white rounded-xl overflow-hidden shadow-sm border border-black/[.04] transition-all duration-300 hover:shadow-md hover:-translate-y-1 flex flex-col"
             >
               <div className="relative aspect-video bg-slate-900/5">
                 {embedUrl ? (

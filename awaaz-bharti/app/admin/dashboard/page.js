@@ -139,34 +139,35 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <main className="flex-1 max-w-[1280px] w-full mx-auto px-5 py-12">
-        <div className="flex flex-col gap-8">
-          <div className="flex justify-between items-center">
+      <main className="flex-1 max-w-[1280px] w-full mx-auto px-4 py-6 sm:py-10">
+        <div className="flex flex-col gap-6 sm:gap-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
-              <h1 className="text-4xl font-black text-gray-900">Hi, {user?.name || 'Admin'}</h1>
-              <p className="text-slate-500 font-medium">System Management Portal</p>
+              <h1 className="text-2xl sm:text-4xl font-black text-gray-900">Hi, {user?.name || 'Admin'}</h1>
+              <p className="text-slate-500 font-medium text-sm">System Management Portal</p>
             </div>
-            <div className="flex gap-3">
-              <button onClick={() => router.push('/admin/articles')} className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all uppercase text-xs tracking-widest shadow-lg shadow-black/10">
-                Manage Articles
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+              <button onClick={() => router.push('/admin/articles')} className="px-3 sm:px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-lg shadow-black/10">
+                Articles
               </button>
-              <button onClick={() => router.push('/admin/live')} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all uppercase text-xs tracking-widest shadow-lg shadow-blue-600/10">
-                Manage Live
+              <button onClick={() => router.push('/admin/live')} className="px-3 sm:px-6 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-lg shadow-blue-600/10">
+                Live
               </button>
-              <button onClick={() => router.push('/admin/videos')} className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all uppercase text-xs tracking-widest shadow-lg shadow-emerald-600/10">
-                Manage Videos
+              <button onClick={() => router.push('/admin/videos')} className="px-3 sm:px-6 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-lg shadow-emerald-600/10">
+                Videos
               </button>
-              <button onClick={() => router.push('/admin/advertisements')} className="px-6 py-2 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all uppercase text-xs tracking-widest shadow-lg shadow-amber-500/20">
-                Manage Ads
+              <button onClick={() => router.push('/admin/advertisements')} className="px-3 sm:px-6 py-2 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-lg shadow-amber-500/20">
+                Ads
               </button>
-              <button onClick={logout} className="px-6 py-2 border-2 border-red-100 text-red-700 font-bold rounded-xl hover:border-red-700 transition-all uppercase text-xs tracking-widest">
+              <button onClick={logout} className="col-span-2 sm:col-span-1 px-3 sm:px-6 py-2 border-2 border-red-100 text-red-700 font-bold rounded-xl hover:border-red-700 transition-all uppercase text-[10px] sm:text-xs tracking-widest">
                 Sign Out
               </button>
             </div>
           </div>
 
           {/* E-Paper Upload */}
-          <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl border border-slate-100">
             <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
               <span className="w-2 h-8 bg-red-700 rounded-full"></span>
               Upload E-Paper
@@ -242,7 +243,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* User Management */}
-          <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl border border-slate-100">
             <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
               <span className="w-2 h-8 bg-red-700 rounded-full"></span>
               Manage Users & Staff

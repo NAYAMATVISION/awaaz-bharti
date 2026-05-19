@@ -50,8 +50,8 @@ export default function SignupPage() {
     <div className="bg-slate-50 min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-1 flex items-center justify-center p-5">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black text-gray-900 mb-2">Create Account</h1>
             <p className="text-slate-500">Join the Awaaz Bharti news community</p>

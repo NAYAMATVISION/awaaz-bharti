@@ -5,11 +5,11 @@ import { getImageUrl } from "../../lib/utils";
 
 export default function HeroSection({ featured }) {
   return (
-    <section className="py-4 pb-2">
+    <section className="py-3 pb-2">
       <Link
         href={`/article/${featured.id}`}
         target="_blank"
-        className="relative rounded-xl overflow-hidden cursor-pointer group min-h-[420px] block"
+        className="relative rounded-xl overflow-hidden cursor-pointer group min-h-[200px] sm:min-h-[300px] md:min-h-[420px] block"
       >
         <Image
           src={getImageUrl(featured.image)}
@@ -20,11 +20,11 @@ export default function HeroSection({ featured }) {
           sizes="(max-width: 1024px) 100vw, 60vw"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-7 pt-12 text-white">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 sm:p-6 md:p-7 text-white">
           <Badge label={`⚡ ${featured.badge}`} type={featured.badgeType} />
-          <h2 className="text-2xl font-black leading-snug mt-3 tracking-tight">{featured.title}</h2>
+          <h2 className="text-base sm:text-xl md:text-2xl font-black leading-snug mt-2 tracking-tight">{featured.title}</h2>
           {featured.description && (
-            <p className="text-sm opacity-75 leading-relaxed mt-2.5">{featured.description}</p>
+            <p className="hidden sm:block text-xs sm:text-sm opacity-75 leading-relaxed mt-1.5">{featured.description}</p>
           )}
         </div>
       </Link>

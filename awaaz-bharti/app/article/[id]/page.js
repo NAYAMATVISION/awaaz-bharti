@@ -22,7 +22,6 @@ async function getArticle(id) {
 
 export default async function ArticlePage({ params }) {
   const { id } = await params;
-  console.log("Debug params.id:", id);
   const article = await getArticle(id);
 
   if (!article) {
@@ -40,14 +39,14 @@ export default async function ArticlePage({ params }) {
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
 
-      <main className="max-w-[800px] mx-auto px-5 py-10">
-        <article className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-10">
+      <main className="max-w-[800px] mx-auto px-4 py-6 sm:py-10">
+        <article className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-10">
           {/* Category Badge */}
           <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase mb-4">
             {article.category}
           </span>
 
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight mb-4 sm:mb-6">
             {article.title}
           </h1>
 

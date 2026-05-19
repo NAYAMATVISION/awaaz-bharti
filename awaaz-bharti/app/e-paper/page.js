@@ -74,7 +74,7 @@ export default function EPaperPage() {
             <iframe
               src={embedUrl}
               width="100%"
-              style={{ height: '90vh', border: 'none' }}
+              style={{ height: 'min(90vh, 700px)', border: 'none' }}
               title={epaper.title}
               allow="autoplay"
             />

@@ -118,16 +118,16 @@ export default function AdminArticlesPage() {
     <div className="bg-slate-50 min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-[1280px] w-full mx-auto px-5 py-12">
-        <div className="flex flex-col gap-8">
-          <div className="flex justify-between items-center">
+      <main className="flex-1 max-w-[1280px] w-full mx-auto px-4 py-6 sm:py-12">
+        <div className="flex flex-col gap-6 sm:gap-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
-              <h1 className="text-4xl font-black text-gray-900">Article Management</h1>
-              <p className="text-slate-500 font-medium">Review, approve, and control content visibility.</p>
+              <h1 className="text-2xl sm:text-4xl font-black text-gray-900">Article Management</h1>
+              <p className="text-slate-500 font-medium text-sm">Review, approve, and control content visibility.</p>
             </div>
             <button
               onClick={() => router.push('/admin/dashboard')}
-              className="px-6 py-2 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:border-slate-900 hover:text-slate-900 transition-all uppercase text-xs tracking-widest"
+              className="w-full sm:w-auto px-6 py-2 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:border-slate-900 hover:text-slate-900 transition-all uppercase text-xs tracking-widest"
             >
               Back to Dashboard
             </button>
@@ -139,7 +139,7 @@ export default function AdminArticlesPage() {
             </div>
           )}
 
-          <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl border border-slate-100">
             <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
               <span className="w-2 h-8 bg-red-700 rounded-full"></span>
               Content Queue

@@ -99,9 +99,6 @@ export const getUsers = async (req, res) => {
  */
 export const updateUser = async (req, res) => {
   try {
-    console.log('UPDATING USER:', req.params.id);
-    console.log('UPDATE BODY:', req.body);
-
     const user = await User.findById(req.params.id);
 
     if (user) {
@@ -110,8 +107,6 @@ export const updateUser = async (req, res) => {
       if (req.body.employeeType !== undefined) user.employeeType = req.body.employeeType;
 
       const updatedUser = await user.save();
-      console.log('USER UPDATED SUCCESSFULLY:', updatedUser._id);
-      
       res.json({
         success: true,
         data: {
@@ -126,7 +121,6 @@ export const updateUser = async (req, res) => {
       res.status(404).json({ success: false, message: 'User not found' });
     }
   } catch (error) {
-    console.error('UPDATE ERROR:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 };

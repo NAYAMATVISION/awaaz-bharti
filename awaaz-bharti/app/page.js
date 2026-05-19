@@ -80,11 +80,11 @@ export default async function HomePage() {
       <BreakingTicker />
       <Navbar />
 
-      <div className="max-w-[1280px] mx-auto px-5">
+      <div className="max-w-[1280px] mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 py-4 pb-10">
 
           {/* LEFT COLUMN — main content */}
-          <main className="flex flex-col gap-6 min-w-0">
+          <main className="flex flex-col gap-6 min-w-0 order-1">
             {heroArticle ? (
               <HeroSection featured={heroArticle} />
             ) : (
@@ -111,7 +111,7 @@ export default async function HomePage() {
           </main>
 
           {/* RIGHT COLUMN — sidebar */}
-          <aside className="flex flex-col gap-5 sticky top-[70px] self-start">
+          <aside className="flex flex-col gap-5 lg:sticky lg:top-[70px] lg:self-start order-2">
             {/* Hero side cards — aligned with hero image */}
             {heroSideArticles.length > 0 && (
               <div className="flex flex-col gap-2.5 pt-4">

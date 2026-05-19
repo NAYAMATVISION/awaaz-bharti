@@ -57,7 +57,7 @@ export default function NewsCard({
       ) : isSmall ? (
         /* ===== SMALL HORIZONTAL CARD ===== */
         <div className="flex gap-3 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-black/[.04] transition-all duration-300 group h-full">
-          <div className="relative w-[110px] h-[80px] shrink-0 overflow-hidden">
+          <div className="relative w-[90px] sm:w-[110px] h-[70px] sm:h-[80px] shrink-0 overflow-hidden">
             <Image
               src={getImageUrl(image)}
               alt={title}
@@ -73,7 +73,7 @@ export default function NewsCard({
       ) : (
         /* ===== DEFAULT CARD (Hero sidebar style) ===== */
         <div className="flex gap-3 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-black/[.04] transition-all duration-300 group flex-1 h-full">
-          <div className="relative w-[130px] h-[100px] shrink-0 overflow-hidden">
+          <div className="relative w-[100px] sm:w-[130px] h-[80px] sm:h-[100px] shrink-0 overflow-hidden">
             <Image
               src={getImageUrl(image)}
               alt={title}

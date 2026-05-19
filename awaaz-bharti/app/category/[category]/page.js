@@ -58,9 +58,9 @@ export default async function CategoryPage({ params }) {
     <div className="bg-slate-50 min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="max-w-[1280px] w-full mx-auto px-5 py-10 flex-1">
-        <div className="mb-8 border-b-2 border-red-700 pb-4 inline-block">
-          <h1 className="text-3xl font-black text-gray-900">{formattedCategory} News</h1>
+      <main className="max-w-[1280px] w-full mx-auto px-4 py-6 sm:py-10 flex-1">
+        <div className="mb-5 sm:mb-8 border-b-2 border-red-700 pb-3 sm:pb-4 inline-block">
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">{formattedCategory} News</h1>
         </div>
 
         {error && (
@@ -70,7 +70,7 @@ export default async function CategoryPage({ params }) {
         )}
 
         {!error && articles.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {articles.map(article => (
               <div key={article.id} className="h-full hover:-translate-y-1 transition-all duration-300">
                 <NewsCard

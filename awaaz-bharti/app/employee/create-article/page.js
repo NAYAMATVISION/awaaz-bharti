@@ -121,10 +121,10 @@ export default function CreateArticlePage() {
     <div className="bg-slate-50 min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-1 max-w-[800px] w-full mx-auto px-5 py-12">
-        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100">
-          <div className="mb-10">
-            <h1 className="text-3xl font-black text-gray-900">Create New Article</h1>
+      <main className="flex-1 max-w-[800px] w-full mx-auto px-4 py-6 sm:py-12">
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 shadow-xl border border-slate-100">
+          <div className="mb-6 sm:mb-10">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Create New Article</h1>
             <p className="text-slate-500 mt-2">Submit your story for editorial review.</p>
           </div>
 
@@ -209,18 +209,18 @@ export default function CreateArticlePage() {
               />
             </div>
 
-            <div className="pt-6 border-t border-slate-100 flex gap-4">
+            <div className="pt-4 sm:pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-8 py-4 rounded-xl border-2 border-slate-100 font-black uppercase text-xs tracking-widest text-slate-500 hover:border-slate-200 transition-all"
+                className="w-full sm:w-auto px-8 py-3 sm:py-4 rounded-xl border-2 border-slate-100 font-black uppercase text-xs tracking-widest text-slate-500 hover:border-slate-200 transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitLoading || uploading}
-                className="flex-1 bg-red-700 text-white font-black py-4 rounded-xl hover:bg-red-800 transition-all shadow-xl shadow-red-700/20 uppercase text-xs tracking-widest disabled:opacity-50"
+                className="flex-1 bg-red-700 text-white font-black py-3 sm:py-4 rounded-xl hover:bg-red-800 transition-all shadow-xl shadow-red-700/20 uppercase text-xs tracking-widest disabled:opacity-50"
               >
                 {submitLoading ? 'Submitting...' : 'Submit for Review'}
               </button>
