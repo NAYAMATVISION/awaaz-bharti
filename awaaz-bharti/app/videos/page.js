@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-export const metadata = { title: "Latest Videos | Awaaz Bharti" };
+export const metadata = { title: "Latest Videos | Awaz Bharti" };
 
 const extractYouTubeId = (url) => {
   if (!url) return null;

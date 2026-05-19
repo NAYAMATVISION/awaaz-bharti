@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-export const metadata = { title: "Live Updates | Awaaz Bharti" };
+export const metadata = { title: "Live Updates | Awaz Bharti" };
 
 async function getLiveUpdates() {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";

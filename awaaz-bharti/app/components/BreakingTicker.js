@@ -1,7 +1,7 @@
 "use client";
 
 const messages = [
-  "Welcome to Awaaz Bharti — Voice of India",
+  "Welcome to Awaz Bharti — Voice of India",
   "Breaking News delivered faster than ever",
   "Stay updated with real-time reports",
   "Trusted journalism, unbiased reporting"

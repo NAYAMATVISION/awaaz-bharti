@@ -55,7 +55,7 @@ export default function ArticleHeader({ article }) {
           </div>
           <div>
             <p className="text-[15px] font-extrabold text-slate-900 leading-none mb-1">By {article.author}</p>
-            <p className="text-xs text-slate-500 font-medium">Awaaz Bharti Senior Correspondent</p>
+            <p className="text-xs text-slate-500 font-medium">Awaz Bharti Senior Correspondent</p>
           </div>
         </div>
 
@@ -100,7 +100,7 @@ export default function ArticleHeader({ article }) {
           />
         </div>
         <figcaption className="text-xs text-slate-500 italic text-center">
-          Featured Image: {article.title} — Photo by Awaaz Bharti
+          Featured Image: {article.title} — Photo by Awaz Bharti
         </figcaption>
       </figure>
     </header>

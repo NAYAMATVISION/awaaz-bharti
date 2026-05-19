@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const FALLBACKS = [
   {
-    title: "Advertise with Awaaz Bharti",
+    title: "Advertise with Awaz Bharti",
     tagline: "Reach thousands of readers daily",
     bg: "from-red-700 to-red-900",
     redirectUrl: "/advertise",

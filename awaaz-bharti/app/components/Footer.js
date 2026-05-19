@@ -33,7 +33,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="text-2xl font-black mb-3">
-              <span className="text-red-600">Awaaz</span>
+              <span className="text-red-600">Awaz</span>
               <span className="text-white">Bharti</span>
             </div>
             <p className="text-[13px] leading-relaxed text-gray-500">
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-9 py-[18px] border-t border-white/[.08] flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-2">
-          <span>© 2026 Awaaz Bharti. All rights reserved.</span>
+          <span>© 2026 Awaz Bharti. All rights reserved.</span>
           <span>Made with ❤️ in India</span>
         </div>
       </div>

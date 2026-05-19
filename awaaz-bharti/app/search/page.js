@@ -3,8 +3,8 @@ import Footer from "../components/Footer";
 import NewsCard from "../components/NewsCard";
 
 export const metadata = {
-  title: 'Search | Awaaz Bharti',
-  description: 'Search for the latest news on Awaaz Bharti',
+  title: 'Search | Awaz Bharti',
+  description: 'Search for the latest news on Awaz Bharti',
 };
 
 // Helper for fetching data
@@ -30,7 +30,7 @@ const mapArticle = (article) => ({
   image: article.image || "/hero_parliament.png",
   badge: article.category?.charAt(0).toUpperCase() + article.category?.slice(1),
   badgeType: article.category?.toLowerCase(),
-  author: article.author?.name || "Awaaz Bharti",
+  author: article.author?.name || "Awaz Bharti",
   time: new Date(article.createdAt).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric'
   }),

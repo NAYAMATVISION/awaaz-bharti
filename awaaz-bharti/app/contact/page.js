@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-export const metadata = { title: "Contact Us | Awaaz Bharti" };
+export const metadata = { title: "Contact Us | Awaz Bharti" };
 
 export default function ContactPage() {
   return (
@@ -14,17 +14,17 @@ export default function ContactPage() {
           <div>
             <h2 className="text-lg font-black text-gray-900 mb-1">Editorial</h2>
             <p>For news tips, corrections, or editorial queries:</p>
-            <p className="font-semibold text-gray-800 mt-1">editorial@awaazBharti.in</p>
+            <p className="font-semibold text-gray-800 mt-1">editorial@AwazBharti.in</p>
           </div>
           <div>
             <h2 className="text-lg font-black text-gray-900 mb-1">Advertising</h2>
             <p>For advertising and partnership inquiries:</p>
-            <p className="font-semibold text-gray-800 mt-1">ads@awaazBharti.in</p>
+            <p className="font-semibold text-gray-800 mt-1">ads@AwazBharti.in</p>
           </div>
           <div>
             <h2 className="text-lg font-black text-gray-900 mb-1">General</h2>
             <p>For all other queries:</p>
-            <p className="font-semibold text-gray-800 mt-1">hello@awaazBharti.in</p>
+            <p className="font-semibold text-gray-800 mt-1">hello@AwazBharti.in</p>
           </div>
         </div>
       </main>

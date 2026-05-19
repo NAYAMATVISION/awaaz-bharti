@@ -64,7 +64,7 @@ export default function LoginPage() {
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black text-gray-900 mb-2">Welcome Back</h1>
-            <p className="text-slate-500">Sign in to your Awaaz Bharti account</p>
+            <p className="text-slate-500">Sign in to your Awaz Bharti account</p>
           </div>
 
           {error && (
@@ -82,7 +82,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                placeholder="admin@awaazbharti.com"
+                placeholder="admin@AwazBharti.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

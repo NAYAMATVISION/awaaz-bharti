@@ -38,7 +38,7 @@ export default function Navbar() {
     return (
       <header className="bg-white border-b border-gray-200 py-3 h-[64px]">
         <div className="max-w-[1280px] mx-auto px-4 flex items-center justify-between">
-          <div className="text-xl sm:text-2xl font-black text-red-700 animate-pulse">Awaaz<span className="text-gray-900">Bharti</span></div>
+          <div className="text-xl sm:text-2xl font-black text-red-700 animate-pulse">Awaz<span className="text-gray-900">Bharti</span></div>
           <div className="w-20 h-8 bg-slate-100 rounded-full animate-pulse" />
         </div>
       </header>
@@ -53,7 +53,7 @@ export default function Navbar() {
           {/* Logo */}
           <a href="/" className="shrink-0">
             <span className="text-xl sm:text-2xl md:text-[28px] font-black text-red-700 leading-none tracking-tight">
-              Awaaz<span className="text-gray-900">Bharti</span>
+              Awaz<span className="text-gray-900">Bharti</span>
             </span>
           </a>
 

@@ -2,9 +2,9 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 
 export const metadata = {
-  title: "Awaaz Bharti — India's Voice",
+  title: "Awaz Bharti — India's Voice",
   description:
-    "Awaaz Bharti delivers breaking news, politics, business, sports and entertainment coverage from India and around the world.",
+    "Awaz Bharti delivers breaking news, politics, business, sports and entertainment coverage from India and around the world.",
   icons: {
     icon: '/icon.png',
   },

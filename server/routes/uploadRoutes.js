@@ -12,7 +12,7 @@ function getUpload() {
   const storage = new CloudinaryStorage({
     cloudinary,
     params: async () => ({
-      folder: 'awaaz-bharti/uploads',
+      folder: 'awaz-bharti/uploads',
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
       transformation: [{ quality: 'auto' }],
     }),

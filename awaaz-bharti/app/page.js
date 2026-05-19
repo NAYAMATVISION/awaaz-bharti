@@ -31,7 +31,7 @@ const mapArticle = (article) => ({
   image: getImageUrl(article.image),
   badge: article.category?.charAt(0).toUpperCase() + article.category?.slice(1),
   badgeType: article.category?.toLowerCase(),
-  author: article.author?.name || "Awaaz Bharti",
+  author: article.author?.name || "Awaz Bharti",
   date: new Date(article.createdAt).toLocaleDateString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric'
   }),
