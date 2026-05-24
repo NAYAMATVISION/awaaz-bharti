@@ -93,22 +93,30 @@ export default function EmployeeDashboard() {
               )}
             </div>
 
-            {/* Add Live News Tool */}
+            {/* Live Stories Tool */}
             <div className={`p-8 rounded-3xl border-2 transition-all ${
               permissions.includes('add_live') || user?.role === 'admin'
-              ? 'border-blue-100 bg-white hover:border-blue-700 shadow-lg'
+              ? 'border-red-100 bg-white hover:border-red-700 shadow-lg'
               : 'border-slate-100 bg-slate-50 opacity-60 grayscale'
             }`}>
               <div className="text-4xl mb-4">📡</div>
-              <h3 className="text-xl font-black text-gray-900 mb-2">Live Updates</h3>
-              <p className="text-sm text-slate-500 mb-6">Post instant live news updates and alerts.</p>
+              <h3 className="text-xl font-black text-gray-900 mb-2">Live Stories</h3>
+              <p className="text-sm text-slate-500 mb-4">Create and manage live coverage events.</p>
               {permissions.includes('add_live') || user?.role === 'admin' ? (
-                <button 
-                  onClick={() => router.push('/employee/create-live')}
-                  className="bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-all w-full uppercase text-xs tracking-widest shadow-md shadow-blue-600/10"
-                >
-                  Broadcast Live
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => router.push('/employee/create-live')}
+                    className="bg-red-700 text-white font-black px-6 py-2.5 rounded-xl hover:bg-red-800 transition-all w-full uppercase text-xs tracking-widest shadow-md shadow-red-700/10"
+                  >
+                    + Create Live Story
+                  </button>
+                  <button
+                    onClick={() => router.push('/employee/my-live-stories')}
+                    className="border-2 border-red-100 text-red-700 font-black px-6 py-2.5 rounded-xl hover:border-red-700 transition-all w-full uppercase text-xs tracking-widest"
+                  >
+                    My Live Stories
+                  </button>
+                </div>
               ) : (
                 <div className="text-xs font-black text-slate-400 uppercase tracking-widest text-center py-2.5 border border-dashed border-slate-200 rounded-xl">
                   Locked

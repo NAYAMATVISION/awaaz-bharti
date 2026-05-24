@@ -40,10 +40,10 @@ const mapArticle = (article) => ({
 });
 
 export default async function HomePage() {
-  const [articles, breakingArticles, liveUpdates, videos] = await Promise.all([
+  const [articles, breakingArticles, liveStories, videos] = await Promise.all([
     getData('/api/articles'),
     getData('/api/articles/breaking'),
-    getData('/api/live'),
+    getData('/api/live-stories'),
     getData('/api/videos'),
   ]);
 
@@ -64,14 +64,14 @@ export default async function HomePage() {
     };
   }).filter(s => s.featured);
 
-  const mappedLive = (liveUpdates || []).map(update => ({
-    id: update._id,
-    slug: update.slug,
-    time: new Date(update.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-    headline: update.title,
-    excerpt: update.excerpt,
-    description: update.content?.replace(/<[^>]*>/g, '').substring(0, 120),
-    coverImage: update.coverImage,
+  const mappedLive = (liveStories || []).map(story => ({
+    id: story._id,
+    slug: story.slug,
+    title: story.title,
+    description: story.description,
+    coverImage: story.coverImage,
+    isLive: story.status === 'live',
+    entryCount: story.entryCount || 0,
   }));
 
   const mappedVideos = (videos || []).map(v => ({
@@ -100,7 +100,7 @@ export default async function HomePage() {
               </div>
             )}
 
-            <LiveUpdates updates={mappedLive} />
+            <LiveUpdates stories={mappedLive} />
 
             <VideoSection videos={mappedVideos} />
 
