@@ -7,6 +7,9 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Image from 'next/image';
 import { getImageUrl } from '../../../lib/utils';
+import dynamic from 'next/dynamic';
+
+const RichTextEditor = dynamic(() => import('../../components/RichTextEditor'), { ssr: false });
 
 export default function CreateArticlePage() {
   const { user, loading } = useAuthContext();
@@ -28,14 +31,11 @@ export default function CreateArticlePage() {
     }
   }, [user, loading, router]);
 
-  const uploadFileHandler = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const uploadImage = async (file) => {
     const uploadFormData = new FormData();
     uploadFormData.append('image', file);
     setUploading(true);
     setError('');
-
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       const token = localStorage.getItem('token');
@@ -45,15 +45,21 @@ export default function CreateArticlePage() {
         body: uploadFormData,
       });
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || 'Upload failed');
-
-      setFormData(prev => ({ ...prev, image: data.image }));
-      setUploading(false);
+      return data.image;
     } catch (err) {
       setError(err.message);
+      return null;
+    } finally {
       setUploading(false);
     }
+  };
+
+  const uploadFileHandler = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = await uploadImage(file);
+    if (url) setFormData(prev => ({ ...prev, image: url }));
   };
 
   const handleSubmit = async (e) => {
@@ -64,42 +70,20 @@ export default function CreateArticlePage() {
       setError('All fields are required');
       return;
     }
-
-    if (formData.title.length < 5) {
-      setError('Title must be at least 5 characters');
-      return;
-    }
-
-    if (formData.content.length < 20) {
-      setError('Content must be at least 20 characters');
-      return;
-    }
+    if (formData.title.length < 5) { setError('Title must be at least 5 characters'); return; }
 
     setSubmitLoading(true);
-
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
+      if (!token) { router.push('/login'); return; }
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       const res = await fetch(`${apiUrl}/api/articles`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(formData)
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to submit article');
-      }
-
+      if (!res.ok) throw new Error(data.message || 'Failed to submit article');
       alert('Article submitted for review');
       router.push('/employee/dashboard');
     } catch (err) {
@@ -121,8 +105,7 @@ export default function CreateArticlePage() {
   return (
     <div className="bg-slate-50 min-h-screen flex flex-col">
       <Navbar />
-      
-      <main className="flex-1 max-w-[800px] w-full mx-auto px-4 py-6 sm:py-12">
+      <main className="flex-1 max-w-[900px] w-full mx-auto px-4 py-6 sm:py-12">
         <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 shadow-xl border border-slate-100">
           <div className="mb-6 sm:mb-10">
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Create New Article</h1>
@@ -130,9 +113,7 @@ export default function CreateArticlePage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-4 rounded-xl mb-8 border border-red-100 text-sm font-bold">
-              {error}
-            </div>
+            <div className="bg-red-50 text-red-700 p-4 rounded-xl mb-8 border border-red-100 text-sm font-bold">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -178,22 +159,17 @@ export default function CreateArticlePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-400 mb-2">Article Image</label>
+                <label className="block text-xs font-black uppercase text-slate-400 mb-2">Cover Image</label>
                 <input
                   type="file"
+                  accept="image/*"
                   className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer"
                   onChange={uploadFileHandler}
                 />
-                {uploading && <p className="text-[10px] text-red-700 font-bold mt-2 animate-pulse uppercase tracking-widest">Uploading Image...</p>}
-                
+                {uploading && <p className="text-[10px] text-red-700 font-bold mt-2 animate-pulse uppercase tracking-widest">Uploading...</p>}
                 {formData.image && (
                   <div className="mt-4 relative w-full h-48 rounded-2xl overflow-hidden border border-slate-100">
-                    <Image 
-                      src={getImageUrl(formData.image)} 
-                      alt="Preview" 
-                      fill 
-                      style={{ objectFit: 'cover' }}
-                    />
+                    <Image src={getImageUrl(formData.image)} alt="Preview" fill style={{ objectFit: 'cover' }} />
                   </div>
                 )}
               </div>
@@ -201,12 +177,11 @@ export default function CreateArticlePage() {
 
             <div>
               <label className="block text-xs font-black uppercase text-slate-400 mb-2">Article Content</label>
-              <textarea
-                placeholder="Start writing your story..."
-                className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500 min-h-[400px] leading-relaxed"
+              <RichTextEditor
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                required
+                onChange={(html) => setFormData(prev => ({ ...prev, content: html }))}
+                placeholder="Start writing your story..."
+                onImageUpload={uploadImage}
               />
             </div>
 
@@ -229,7 +204,6 @@ export default function CreateArticlePage() {
           </form>
         </div>
       </main>
-
       <Footer />
     </div>
   );

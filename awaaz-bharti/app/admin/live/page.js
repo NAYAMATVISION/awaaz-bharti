@@ -29,13 +29,9 @@ export default function AdminLiveNewsPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (res.ok && data.success) {
-        setLiveNews(data.data);
-      } else {
-        setError(data.message || 'Failed to fetch live news');
-      }
-    } catch (err) {
-      console.error('Error fetching live news:', err);
+      if (res.ok && data.success) setLiveNews(data.data);
+      else setError(data.message || 'Failed to fetch live news');
+    } catch {
       setError('Connection error. Please check your backend.');
     } finally {
       setLoadingNews(false);
@@ -46,14 +42,25 @@ export default function AdminLiveNewsPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${apiUrl}/api/live/${id}/${action}`, {
+      await fetch(`${apiUrl}/api/live/${id}/${action}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) fetchLiveNews();
-    } catch (err) {
-      console.error('Error updating status:', err);
-    }
+      fetchLiveNews();
+    } catch {}
+  };
+
+  const updateField = async (id, fields) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${apiUrl}/api/live/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(fields),
+      });
+      fetchLiveNews();
+    } catch {}
   };
 
   const deleteItem = async (id) => {
@@ -61,14 +68,12 @@ export default function AdminLiveNewsPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${apiUrl}/api/live/${id}`, {
+      await fetch(`${apiUrl}/api/live/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) fetchLiveNews();
-    } catch (err) {
-      console.error('Error deleting live update:', err);
-    }
+      fetchLiveNews();
+    } catch {}
   };
 
   if (loading || (user && user.role !== 'admin')) {
@@ -89,7 +94,7 @@ export default function AdminLiveNewsPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-black text-gray-900">Live News Management</h1>
-              <p className="text-slate-500 font-medium">Review, approve, and control live updates.</p>
+              <p className="text-slate-500 font-medium">Review, approve, feature, and control live updates.</p>
             </div>
             <button
               onClick={() => router.push('/admin/dashboard')}
@@ -100,9 +105,7 @@ export default function AdminLiveNewsPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 font-bold text-sm">
-              {error}
-            </div>
+            <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 font-bold text-sm">{error}</div>
           )}
 
           <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
@@ -112,13 +115,9 @@ export default function AdminLiveNewsPage() {
             </h2>
 
             {loadingNews ? (
-              <div className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse">
-                Loading live news...
-              </div>
+              <div className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse">Loading live news...</div>
             ) : liveNews.length === 0 ? (
-              <div className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest">
-                No live updates found.
-              </div>
+              <div className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest">No live updates found.</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -126,6 +125,7 @@ export default function AdminLiveNewsPage() {
                     <tr className="border-b border-slate-100">
                       <th className="py-4 px-2 text-xs font-black uppercase text-slate-400">Update Detail</th>
                       <th className="py-4 px-2 text-xs font-black uppercase text-slate-400">Status</th>
+                      <th className="py-4 px-2 text-xs font-black uppercase text-slate-400">Featured</th>
                       <th className="py-4 px-2 text-xs font-black uppercase text-slate-400 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -134,11 +134,26 @@ export default function AdminLiveNewsPage() {
                       <tr key={news._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                         <td className="py-4 px-2">
                           <div className="font-bold text-gray-900">{news.title}</div>
-                          <div className="text-sm text-slate-500 mt-1 line-clamp-2">{news.content}</div>
-                          <div className="text-[10px] flex items-center gap-2 mt-2">
-                            <span className="text-slate-400">By {news.createdBy?.name || 'Unknown'}</span>
+                          {news.excerpt && (
+                            <div className="text-sm text-slate-500 mt-0.5 line-clamp-1">{news.excerpt}</div>
+                          )}
+                          <div className="text-[10px] flex items-center gap-2 mt-1.5">
+                            <span className="text-slate-400">By {news.author || news.createdBy?.name || 'Unknown'}</span>
                             <span className="text-slate-400">·</span>
                             <span className="text-slate-400">{new Date(news.timestamp).toLocaleString()}</span>
+                            {news.slug && (
+                              <>
+                                <span className="text-slate-400">·</span>
+                                <a
+                                  href={`/live-updates/${news.slug}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-blue-500 hover:underline"
+                                >
+                                  View →
+                                </a>
+                              </>
+                            )}
                           </div>
                         </td>
 
@@ -150,6 +165,35 @@ export default function AdminLiveNewsPage() {
                           }`}>
                             {news.status}
                           </span>
+                        </td>
+
+                        <td className="py-4 px-2">
+                          {news.status === 'approved' && (
+                            <div className="flex flex-col gap-1.5">
+                              <label className="flex items-center gap-1.5 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={news.isFeatured || false}
+                                  onChange={(e) => updateField(news._id, { isFeatured: e.target.checked })}
+                                  className="w-3.5 h-3.5 accent-red-700 cursor-pointer"
+                                />
+                                <span className={`text-[10px] font-black uppercase ${news.isFeatured ? 'text-red-700' : 'text-slate-300'}`}>
+                                  Featured
+                                </span>
+                              </label>
+                              {news.isFeatured && (
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max="10"
+                                  defaultValue={news.featuredPriority || 1}
+                                  onBlur={(e) => updateField(news._id, { featuredPriority: Number(e.target.value) })}
+                                  className="w-14 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-center focus:outline-none focus:border-red-700"
+                                  placeholder="Order"
+                                />
+                              )}
+                            </div>
+                          )}
                         </td>
 
                         <td className="py-4 px-2 text-right">

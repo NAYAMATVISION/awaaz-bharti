@@ -1,5 +1,8 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Image from "next/image";
+import Link from "next/link";
+import { getImageUrl } from "../../lib/utils";
 
 export const metadata = { title: "Live Updates | Awaz Bharti" };
 
@@ -33,26 +36,54 @@ export default async function LiveUpdatesPage() {
             <p className="text-gray-500">Check back soon for the latest updates.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-black/[.04] p-5 max-w-3xl">
-            <div className="relative pl-5">
-              <div className="absolute left-[5px] top-0 bottom-0 w-0.5 bg-gray-200" />
-              <div className="space-y-4">
-                {updates.map((item, i) => (
-                  <div key={item._id} className="relative">
-                    <div className={`absolute -left-5 top-2 w-2.5 h-2.5 rounded-full border-2 border-red-700 z-10 ${i === 0 ? "bg-red-700 shadow-[0_0_0_3px_rgba(215,44,22,.15)]" : "bg-white"}`} />
-                    <div className={`rounded-lg p-3 ${i === 0 ? "bg-red-50 border border-red-200" : ""}`}>
-                      <span className="text-[10px] font-bold text-red-700 uppercase block mb-0.5">
-                        {new Date(item.timestamp).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true })}
-                        {" · "}
-                        {new Date(item.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                      </span>
-                      <h4 className="text-[14px] font-extrabold leading-snug text-gray-900 mb-0.5">{item.title}</h4>
-                      <p className="text-[13px] text-gray-600 leading-relaxed">{item.content}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {updates.map((item, i) => {
+              const href = `/live-updates/${item.slug || item._id}`;
+              return (
+                <Link
+                  key={item._id}
+                  href={href}
+                  className="bg-white rounded-xl shadow-sm border border-black/[.04] overflow-hidden hover:shadow-md hover:border-red-200 transition-all group flex flex-col"
+                >
+                  {item.coverImage ? (
+                    <div className="relative w-full h-44 overflow-hidden">
+                      <Image
+                        src={getImageUrl(item.coverImage)}
+                        alt={item.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {i === 0 && (
+                        <span className="absolute top-3 left-3 bg-red-700 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> Latest
+                        </span>
+                      )}
                     </div>
+                  ) : (
+                    <div className="w-full h-20 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                      <span className="text-3xl">📡</span>
+                    </div>
+                  )}
+
+                  <div className="p-4 flex flex-col flex-1">
+                    <span className="text-[10px] font-bold text-red-700 uppercase block mb-1.5">
+                      {new Date(item.timestamp).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true })}
+                      {" · "}
+                      {new Date(item.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                    <h4 className="text-[14px] font-extrabold leading-snug text-gray-900 mb-2 group-hover:text-red-700 transition-colors line-clamp-2">
+                      {item.title}
+                    </h4>
+                    {item.excerpt && (
+                      <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-2 flex-1">{item.excerpt}</p>
+                    )}
+                    <span className="mt-3 text-[11px] font-black text-red-700 uppercase tracking-widest group-hover:gap-2 flex items-center gap-1 transition-all">
+                      Read More →
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>

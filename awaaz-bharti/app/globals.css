@@ -29,3 +29,36 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Rich text / Tiptap editor prose styles */
+.prose h1 { display: block; font-size: 2rem; font-weight: 900; margin: 1.25rem 0 0.75rem; line-height: 1.2; color: #111827; }
+.prose h2 { display: block; font-size: 1.5rem; font-weight: 900; margin: 1.1rem 0 0.6rem; line-height: 1.25; color: #111827; }
+.prose h3 { display: block; font-size: 1.25rem; font-weight: 800; margin: 1rem 0 0.5rem; color: #111827; }
+.prose h4 { display: block; font-size: 1.1rem; font-weight: 800; margin: 0.9rem 0 0.4rem; color: #111827; }
+.prose p { display: block; margin: 0.75rem 0; line-height: 1.75; }
+.prose ul { display: block; list-style: disc; padding-left: 1.5rem; margin: 0.75rem 0; }
+.prose ol { display: block; list-style: decimal; padding-left: 1.5rem; margin: 0.75rem 0; }
+.prose li { display: list-item; margin: 0.3rem 0; }
+.prose blockquote { display: block; border-left: 4px solid #b91c1c; padding-left: 1rem; margin: 1rem 0; color: #475569; font-style: italic; }
+.prose a { color: #b91c1c; text-decoration: underline; }
+.prose a:hover { color: #991b1b; }
+.prose code { background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; font-family: monospace; }
+.prose pre { display: block; background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; }
+.prose pre code { background: none; padding: 0; }
+.prose img { display: block; max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
+.prose hr { display: block; border: none; border-top: 2px solid #e2e8f0; margin: 1.5rem 0; }
+.prose strong { font-weight: 800; }
+.prose em { font-style: italic; }
+.prose s { text-decoration: line-through; }
+.prose iframe { display: block; width: 100%; border-radius: 0.5rem; }
+.prose .aspect-video { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0; }
+.prose .aspect-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+/* Tiptap placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
