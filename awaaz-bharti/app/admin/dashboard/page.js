@@ -160,6 +160,9 @@ export default function AdminDashboard() {
               <button onClick={() => router.push('/admin/advertisements')} className="px-3 sm:px-6 py-2 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-lg shadow-amber-500/20">
                 Ads
               </button>
+              <button onClick={() => router.push('/admin/categories')} className="px-3 sm:px-6 py-2 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-lg shadow-violet-600/10">
+                Categories
+              </button>
               <button onClick={logout} className="col-span-2 sm:col-span-1 px-3 sm:px-6 py-2 border-2 border-red-100 text-red-700 font-bold rounded-xl hover:border-red-700 transition-all uppercase text-[10px] sm:text-xs tracking-widest">
                 Sign Out
               </button>

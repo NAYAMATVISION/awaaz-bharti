@@ -4,22 +4,42 @@ import { useState, useEffect } from "react";
 import { useAuthContext } from "../context/AuthContext";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { label: "Home", href: "/", cat: "home" },
-  { label: "Politics", href: "/category/politics", cat: "politics" },
-  { label: "Business", href: "/category/business", cat: "business" },
-  { label: "Technology", href: "/category/technology", cat: "technology" },
-  { label: "Sports", href: "/category/sports", cat: "sports" },
-  { label: "Entertainment", href: "/category/entertainment", cat: "entertainment" },
-  { label: "Health & Crime", href: "/category/health", cat: "health" },
-  { label: "E-Paper", href: "/e-paper", cat: "epaper" },
-];
+const STATIC_START = [{ label: "Home", href: "/", cat: "home" }];
+const STATIC_END = [{ label: "E-Paper", href: "/e-paper", cat: "epaper" }];
 
 export default function Navbar() {
   const { user, loading, logout } = useAuthContext();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navItems, setNavItems] = useState([
+    ...STATIC_START,
+    { label: "Politics",      href: "/category/politics",      cat: "politics" },
+    { label: "Business",      href: "/category/business",      cat: "business" },
+    { label: "Technology",    href: "/category/technology",    cat: "technology" },
+    { label: "Sports",        href: "/category/sports",        cat: "sports" },
+    { label: "Entertainment", href: "/category/entertainment", cat: "entertainment" },
+    { label: "Health",        href: "/category/health",        cat: "health" },
+    { label: "Crime",         href: "/category/crime",         cat: "crime" },
+    ...STATIC_END,
+  ]);
+
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    fetch(`${apiUrl}/api/categories`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          const catItems = data.data.map(c => ({
+            label: c.name,
+            href: `/category/${c.slug}`,
+            cat: c.slug,
+          }));
+          setNavItems([...STATIC_START, ...catItems, ...STATIC_END]);
+        }
+      })
+      .catch(() => {}); // keep fallback on error
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -27,7 +47,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const today = new Date().toLocaleDateString("en-IN", {
@@ -120,7 +139,6 @@ export default function Navbar() {
         {/* Mobile dropdown menu */}
         {menuOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 flex flex-col gap-3">
-            {/* Nav links */}
             <div className="grid grid-cols-2 gap-2">
               {navItems.map(item => (
                 <a key={item.cat} href={item.href}
@@ -133,8 +151,6 @@ export default function Navbar() {
                 </a>
               ))}
             </div>
-
-            {/* Auth buttons */}
             <div className="border-t border-slate-100 pt-3 flex flex-col gap-2">
               {user ? (
                 <>
@@ -180,7 +196,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile sticky nav bar (horizontal scroll) */}
+      {/* Mobile sticky nav bar */}
       <nav className={`md:hidden bg-white border-b-[3px] border-red-700 sticky top-0 z-[900] transition-shadow ${scrolled ? "shadow-md" : "shadow-sm"}`}>
         <div className="px-2">
           <ul className="flex items-center overflow-x-auto scrollbar-hide">

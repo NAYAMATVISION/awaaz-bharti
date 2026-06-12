@@ -18,13 +18,15 @@ import liveStoryRoutes from './routes/liveStoryRoutes.js';
 import videoRoutes from './routes/videoRoutes.js';
 import epaperRoutes from './routes/epaperRoutes.js';
 import advertisementRoutes from './routes/advertisementRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import { seedCategories } from './controllers/categoryController.js';
 import { protect, adminOnly } from './middleware/authMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Connect to database
-connectDB();
+connectDB().then(() => seedCategories());
 
 // Ensure upload directories exist (for any local fallback)
 ['uploads', 'uploads/epaper'].forEach(dir => {
@@ -71,6 +73,7 @@ app.use('/api/live-stories', liveStoryRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/epaper', epaperRoutes);
 app.use('/api/ads', advertisementRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Test Routes
 app.get('/api/test', (req, res) => {

@@ -16,10 +16,11 @@ export default function CreateArticlePage() {
   const [formData, setFormData] = useState({
     title: '',
     subheading: '',
-    category: 'politics',
+    category: '',
     image: '',
     content: ''
   });
+  const [categories, setCategories] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,6 +31,19 @@ export default function CreateArticlePage() {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/categories`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          setCategories(data.data);
+          setFormData(prev => ({ ...prev, category: prev.category || data.data[0].slug }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const uploadImage = async (file) => {
     const uploadFormData = new FormData();
@@ -149,12 +163,16 @@ export default function CreateArticlePage() {
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
-                  <option value="politics">Politics</option>
-                  <option value="business">Business</option>
-                  <option value="technology">Technology</option>
-                  <option value="sports">Sports</option>
-                  <option value="entertainment">Entertainment</option>
-                  <option value="health">Health</option>
+                  {categories.length > 0 ? (
+                    categories.map(cat => (
+                      <option key={cat._id} value={cat.slug}>{cat.name}</option>
+                    ))
+                  ) : (
+                    // Fallback if API unavailable
+                    ['politics','business','technology','sports','entertainment','health','crime'].map(s => (
+                      <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                    ))
+                  )}
                 </select>
               </div>
 

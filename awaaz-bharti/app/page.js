@@ -40,11 +40,12 @@ const mapArticle = (article) => ({
 });
 
 export default async function HomePage() {
-  const [articles, breakingArticles, liveStories, videos] = await Promise.all([
+  const [articles, breakingArticles, liveStories, videos, dbCategories] = await Promise.all([
     getData('/api/articles'),
     getData('/api/articles/breaking'),
     getData('/api/live-stories'),
     getData('/api/videos'),
+    getData('/api/categories'),
   ]);
 
   const mappedArticles = (articles || []).map(mapArticle);
@@ -52,13 +53,19 @@ export default async function HomePage() {
   const heroArticle = mappedArticles[0] || null;
   const heroSideArticles = mappedArticles.slice(1, 5);
 
-  const categories = ["politics", "business", "technology", "sports", "entertainment", "health"];
-  const categorySections = categories.map(cat => {
+  const EMOJI = { politics:'🏛️', business:'📈', technology:'💻', sports:'🏏', entertainment:'🎬', health:'🏥', crime:'🚔' };
+  const activeCats = (dbCategories || []).map(c => c.slug);
+  const catList = activeCats.length > 0
+    ? activeCats
+    : ['politics','business','technology','sports','entertainment','health','crime'];
+
+  const categorySections = catList.map(cat => {
     const catArticles = mappedArticles.filter(a => a.badgeType === cat);
+    const dbCat = (dbCategories || []).find(c => c.slug === cat);
     return {
       id: cat,
-      title: cat.charAt(0).toUpperCase() + cat.slice(1),
-      emoji: cat === "politics" ? "🏛️" : cat === "business" ? "📈" : cat === "technology" ? "💻" : cat === "sports" ? "🏏" : cat === "entertainment" ? "🎬" : "🏥",
+      title: dbCat ? dbCat.name : cat.charAt(0).toUpperCase() + cat.slice(1),
+      emoji: EMOJI[cat] || '📰',
       featured: catArticles[0] || null,
       articles: catArticles.slice(1, 5),
     };
