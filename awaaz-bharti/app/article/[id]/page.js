@@ -5,6 +5,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getImageUrl } from "../../../lib/utils";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://awaazbharti.com';
+const SITE_NAME = 'Awaz Bharti';
+
 // Fetch article data
 async function getArticle(id) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -18,6 +21,47 @@ async function getArticle(id) {
     console.error("Error fetching article:", error);
     return null;
   }
+}
+
+const stripHtml = (html) =>
+  (html || '').replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim();
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const article = await getArticle(id);
+
+  if (!article) {
+    return { title: `Article Not Found | ${SITE_NAME}` };
+  }
+
+  const title = `${article.title} | ${SITE_NAME}`;
+  const description = article.subheading
+    ? article.subheading
+    : stripHtml(article.content).substring(0, 160);
+  const image = getImageUrl(article.image);
+  const url = `${SITE_URL}/article/${id}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'article',
+      siteName: SITE_NAME,
+      title: article.title,
+      description,
+      url,
+      images: [{ url: image, width: 1200, height: 630, alt: article.title }],
+      publishedTime: article.createdAt,
+      authors: [article.author?.name || 'Awaz Bharti'],
+      section: article.category,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function ArticlePage({ params }) {

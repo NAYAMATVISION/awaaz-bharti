@@ -12,8 +12,13 @@ export default function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [epaperUrl, setEpaperUrl] = useState('');
   const [epaperTitle, setEpaperTitle] = useState('');
+  const [epaperDate, setEpaperDate] = useState('');
+  const [epaperCover, setEpaperCover] = useState('');
+  const [epaperCoverUploading, setEpaperCoverUploading] = useState(false);
   const [epaperUploading, setEpaperUploading] = useState(false);
   const [epaperMsg, setEpaperMsg] = useState('');
+  const [epaperList, setEpaperList] = useState([]);
+  const [epaperListLoading, setEpaperListLoading] = useState(false);
   // Modal state
   const [modal, setModal] = useState(null); // { userId }
   const [designation, setDesignation] = useState('');
@@ -79,6 +84,34 @@ export default function AdminDashboard() {
     const current = targetUser.permissions || [];
     const next = current.includes(perm) ? current.filter(p => p !== perm) : [...current, perm];
     updateUser(targetUser._id, { permissions: next });
+  };
+
+  const fetchEpaperList = async () => {
+    setEpaperListLoading(true);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    try {
+      const res = await fetch(`${apiUrl}/api/epaper/archive?limit=20&page=1`);
+      const data = await res.json();
+      if (data.success) setEpaperList(data.data);
+    } catch {}
+    finally { setEpaperListLoading(false); }
+  };
+
+  const deleteEpaper = async (id, title) => {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${apiUrl}/api/epaper/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEpaperList(prev => prev.filter(e => e._id !== id));
+        setEpaperMsg('Edition deleted.');
+      }
+    } catch {}
   };
 
   const confirmMakeEmployee = () => {
@@ -195,11 +228,13 @@ export default function AdminDashboard() {
                     body: JSON.stringify({
                       title: epaperTitle || `E-Paper ${new Date().toLocaleDateString('en-IN')}`,
                       fileUrl: embedUrl,
+                      publicationDate: epaperDate || new Date().toISOString(),
+                      coverImage: epaperCover,
                     }),
                   });
                   const data = await res.json();
                   setEpaperMsg(data.success ? 'E-paper updated successfully' : (data.message || 'Failed'));
-                  if (data.success) { setEpaperUrl(''); setEpaperTitle(''); }
+                  if (data.success) { setEpaperUrl(''); setEpaperTitle(''); setEpaperDate(''); setEpaperCover(''); }
                 } catch {
                   setEpaperMsg('Failed. Please try again.');
                 } finally {
@@ -219,6 +254,16 @@ export default function AdminDashboard() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-black uppercase text-slate-400 tracking-widest">Publication Date</label>
+                <input
+                  type="date"
+                  value={epaperDate}
+                  onChange={e => setEpaperDate(e.target.value)}
+                  className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-700 transition-all"
+                />
+                <p className="text-[11px] text-slate-400">Leave blank to use today&apos;s date</p>
+              </div>
+              <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-black uppercase text-slate-400 tracking-widest">Google Drive PDF Link</label>
                 <input
                   type="url"
@@ -230,6 +275,54 @@ export default function AdminDashboard() {
                 />
                 <p className="text-[11px] text-slate-400">Upload PDF to Google Drive → Share → Copy link → Paste here</p>
               </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-black uppercase text-slate-400 tracking-widest">
+                  Cover Image <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    setEpaperCoverUploading(true);
+                    const fd = new FormData();
+                    fd.append('image', file);
+                    try {
+                      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                      const token = localStorage.getItem('token');
+                      const res = await fetch(`${apiUrl}/api/upload`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: fd,
+                      });
+                      const data = await res.json();
+                      if (data.image) setEpaperCover(data.image);
+                    } catch {}
+                    finally { setEpaperCoverUploading(false); }
+                  }}
+                  className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer focus:outline-none focus:border-red-700 transition-all"
+                />
+                {epaperCoverUploading && (
+                  <p className="text-[11px] text-red-700 font-bold animate-pulse uppercase tracking-widest">Uploading cover image...</p>
+                )}
+                {epaperCover && !epaperCoverUploading && (
+                  <div className="flex items-center gap-3 mt-1">
+                    <img src={epaperCover} alt="Cover preview" className="h-20 w-14 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                    <div>
+                      <p className="text-[11px] text-emerald-600 font-bold">✓ Cover image uploaded</p>
+                      <button
+                        type="button"
+                        onClick={() => setEpaperCover('')}
+                        className="text-[10px] text-red-400 hover:text-red-700 font-black uppercase tracking-widest mt-1"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <p className="text-[11px] text-slate-400">Upload the front page image of the newspaper edition.</p>
+              </div>
               <button
                 type="submit"
                 disabled={epaperUploading || !epaperUrl.trim()}
@@ -239,10 +332,60 @@ export default function AdminDashboard() {
               </button>
             </form>
             {epaperMsg && (
-              <p className={`mt-4 text-sm font-bold ${epaperMsg.includes('successfully') ? 'text-emerald-600' : 'text-red-600'}`}>
+              <p className={`mt-4 text-sm font-bold ${epaperMsg.includes('successfully') || epaperMsg.includes('deleted') ? 'text-emerald-600' : 'text-red-600'}`}>
                 {epaperMsg}
               </p>
             )}
+
+            {/* Manage existing editions */}
+            <div className="mt-6 pt-6 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Manage Editions</h3>
+                <button
+                  type="button"
+                  onClick={fetchEpaperList}
+                  disabled={epaperListLoading}
+                  className="text-[11px] font-black text-red-700 hover:underline uppercase tracking-widest disabled:opacity-50"
+                >
+                  {epaperListLoading ? 'Loading...' : 'Load Editions'}
+                </button>
+              </div>
+
+              {epaperList.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {epaperList.map(edition => (
+                    <div key={edition._id} className="flex items-center gap-3 bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
+                      {edition.coverImage ? (
+                        <img src={edition.coverImage} alt={edition.title} className="w-8 h-11 object-cover rounded border border-slate-200 shrink-0" />
+                      ) : (
+                        <div className="w-8 h-11 bg-slate-200 rounded flex items-center justify-center shrink-0">
+                          <span className="text-[9px] font-black text-slate-400">PDF</span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate">{edition.title}</p>
+                        <p className="text-[11px] text-slate-400">
+                          {new Date(edition.publicationDate || edition.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric', month: 'short', year: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => deleteEpaper(edition._id, edition.title)}
+                        className="text-[11px] font-black text-red-400 hover:text-red-700 uppercase tracking-widest transition-all shrink-0"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {epaperList.length === 0 && !epaperListLoading && (
+                <p className="text-[12px] text-slate-400 italic">Click &quot;Load Editions&quot; to see all uploaded e-papers.</p>
+              )}
+            </div>
           </div>
 
           {/* User Management */}
