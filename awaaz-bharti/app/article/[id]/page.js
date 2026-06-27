@@ -1,6 +1,7 @@
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import TextToSpeech from "../../components/TextToSpeech";
+import ShareButtons from "../../components/ShareButtons";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getImageUrl, getArticleUrl } from "../../../lib/utils";
@@ -104,6 +105,9 @@ export default async function ArticlePage({ params }) {
               <p className="text-xs text-gray-500">{formattedDate}</p>
             </div>
           </div>
+
+          {/* Share Buttons */}
+          <ShareButtons />
 
           {/* Text to Speech Component */}
           <TextToSpeech text={article.content} />
