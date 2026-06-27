@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import NewsCard from "../components/NewsCard";
+import { getArticleUrl } from "../../lib/utils";
 
 export const metadata = {
   title: 'Search | Awaz Bharti',
@@ -34,6 +35,7 @@ const mapArticle = (article) => ({
   time: new Date(article.createdAt).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric'
   }),
+  url: getArticleUrl(article),
 });
 
 export default async function SearchPage({ searchParams }) {
@@ -87,6 +89,7 @@ export default async function SearchPage({ searchParams }) {
                   categoryType={article.badgeType}
                   time={article.time}
                   description={article.description}
+                  url={article.url}
                   isSmall={false}
                 />
               </div>

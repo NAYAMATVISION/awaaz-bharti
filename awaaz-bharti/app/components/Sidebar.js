@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getArticleUrl } from "../../lib/utils";
 import SidebarAds from "./SidebarAds";
 
 export default function Sidebar() {
@@ -29,7 +30,7 @@ export default function Sidebar() {
             trending.map((item, i) => (
               <Link
                 key={item._id}
-                href={`/article/${item._id}`}
+                href={getArticleUrl(item)}
                 target="_blank"
                 className="flex items-start gap-3.5 px-[18px] py-3.5 border-b border-gray-100 last:border-0 transition-all duration-200 hover:bg-red-50 hover:translate-x-0.5 group"
               >

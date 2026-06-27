@@ -13,6 +13,7 @@ import {
   updateArticle,
   deleteArticle,
   deleteMyArticle,
+  updateMyArticle,
   getTrendingArticles,
   toggleTrending,
   setTrendingOrder,
@@ -38,6 +39,7 @@ router.put('/:id/reject', protect, adminOnly, rejectArticle);
 router.put('/:id/toggle-trending', protect, adminOnly, toggleTrending);
 router.put('/:id/set-trending-order', protect, adminOnly, setTrendingOrder);
 router.delete('/:id', protect, adminOnly, deleteArticle);
+router.put('/:id/me', protect, employeeOnly, updateMyArticle);
 router.delete('/:id/me', protect, employeeOnly, deleteMyArticle);
 
 // Public dynamic route (must be last)

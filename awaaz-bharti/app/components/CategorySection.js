@@ -34,6 +34,7 @@ export default function CategorySection({ id, title, emoji, featured, articles }
           categoryType={featured.badgeType}
           author={featured.author}
           time={featured.time}
+          url={featured.url}
           isFeatured
         />
 
@@ -46,6 +47,7 @@ export default function CategorySection({ id, title, emoji, featured, articles }
               title={article.title}
               image={article.image}
               time={article.time}
+              url={article.url}
               isSmall
             />
           ))}

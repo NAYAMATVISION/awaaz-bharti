@@ -20,6 +20,7 @@ export default function RelatedArticles({ articles }) {
               category={article.badge || article.category}
               categoryType={article.badgeType}
               time={article.time}
+              url={article.url}
             />
           </div>
         ))}

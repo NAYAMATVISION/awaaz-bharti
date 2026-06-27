@@ -283,6 +283,12 @@ export default function AdminArticlesPage() {
                               </button>
                             )}
                             <button
+                              onClick={() => router.push(`/admin/articles/edit/${art._id}`)}
+                              className="text-[10px] font-black text-blue-500 hover:text-blue-700 transition-all uppercase tracking-widest"
+                            >
+                              Edit
+                            </button>
+                            <button
                               onClick={() => deleteArticle(art._id)}
                               className="text-[10px] font-black text-red-400 hover:text-red-700 transition-all uppercase tracking-widest"
                             >

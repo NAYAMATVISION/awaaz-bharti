@@ -1,18 +1,19 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthContext } from '../../context/AuthContext';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import { useRouter, useParams } from 'next/navigation';
+import { useAuthContext } from '../../../context/AuthContext';
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
 import Image from 'next/image';
-import { getImageUrl, getArticleUrl } from '../../../lib/utils';
+import { getImageUrl, getArticleUrl } from '../../../../lib/utils';
 import dynamic from 'next/dynamic';
 
-const RichTextEditor = dynamic(() => import('../../components/RichTextEditor'), { ssr: false });
+const RichTextEditor = dynamic(() => import('../../../components/RichTextEditor'), { ssr: false });
 
-export default function CreateArticlePage() {
+export default function EditArticlePage() {
   const { user, loading } = useAuthContext();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     title: '',
     subheading: '',
@@ -25,6 +26,7 @@ export default function CreateArticlePage() {
   const [categories, setCategories] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -39,13 +41,42 @@ export default function CreateArticlePage() {
     fetch(`${apiUrl}/api/categories`)
       .then(r => r.json())
       .then(data => {
-        if (data.success && data.data.length > 0) {
-          setCategories(data.data);
-          setFormData(prev => ({ ...prev, category: prev.category || data.data[0].slug }));
-        }
+        if (data.success && data.data.length > 0) setCategories(data.data);
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!user || !id) return;
+    const loadArticle = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`${apiUrl}/api/articles/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load article');
+        const article = data.data.find((a) => a._id === id);
+        if (!article) throw new Error('Article not found');
+        if (article.status !== 'pending') throw new Error('Only pending articles can be edited');
+        setFormData({
+          title: article.title || '',
+          subheading: article.subheading || '',
+          category: article.category || '',
+          subCategory: article.subCategory || '',
+          seoUrlTitle: article.seoUrlTitle || '',
+          image: article.image || '',
+          content: article.content || '',
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setPageLoading(false);
+      }
+    };
+    loadArticle();
+  }, [user, id]);
 
   const uploadImage = async (file) => {
     const uploadFormData = new FormData();
@@ -57,7 +88,7 @@ export default function CreateArticlePage() {
       const token = localStorage.getItem('token');
       const res = await fetch(`${apiUrl}/api/upload`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         body: uploadFormData,
       });
       const data = await res.json();
@@ -75,7 +106,7 @@ export default function CreateArticlePage() {
     const file = e.target.files[0];
     if (!file) return;
     const url = await uploadImage(file);
-    if (url) setFormData(prev => ({ ...prev, image: url }));
+    if (url) setFormData((prev) => ({ ...prev, image: url }));
   };
 
   const handleSubmit = async (e) => {
@@ -86,22 +117,20 @@ export default function CreateArticlePage() {
       setError('All fields are required');
       return;
     }
-    if (formData.title.length < 5) { setError('Title must be at least 5 characters'); return; }
 
     setSubmitLoading(true);
     try {
       const token = localStorage.getItem('token');
-      if (!token) { router.push('/login'); return; }
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/articles`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(formData)
+      const res = await fetch(`${apiUrl}/api/articles/${id}/me`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to submit article');
-      alert('Article submitted for review');
-      router.push('/employee/dashboard');
+      if (!res.ok) throw new Error(data.message || 'Failed to update article');
+      alert('Article updated successfully');
+      router.push('/employee/my-submissions');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,7 +138,7 @@ export default function CreateArticlePage() {
     }
   };
 
-  if (loading || (user && user.role !== 'employee' && user.role !== 'admin')) {
+  if (loading || pageLoading || (user && user.role !== 'employee' && user.role !== 'admin')) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
         <div className="w-12 h-12 border-4 border-slate-200 border-t-red-700 rounded-full animate-spin mb-4"></div>
@@ -124,8 +153,8 @@ export default function CreateArticlePage() {
       <main className="flex-1 max-w-[900px] w-full mx-auto px-4 py-6 sm:py-12">
         <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 shadow-xl border border-slate-100">
           <div className="mb-6 sm:mb-10">
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Create New Article</h1>
-            <p className="text-slate-500 mt-2">Submit your story for editorial review.</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Edit Article</h1>
+            <p className="text-slate-500 mt-2">Update your pending submission.</p>
           </div>
 
           {error && (
@@ -137,7 +166,6 @@ export default function CreateArticlePage() {
               <label className="block text-xs font-black uppercase text-slate-400 mb-2">Article Title</label>
               <input
                 type="text"
-                placeholder="Enter a compelling title"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-gray-900 text-lg"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -149,7 +177,6 @@ export default function CreateArticlePage() {
               <label className="block text-xs font-black uppercase text-slate-400 mb-2">Subheading / Summary</label>
               <input
                 type="text"
-                placeholder="Brief summary of the article"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700"
                 value={formData.subheading}
                 onChange={(e) => setFormData({ ...formData, subheading: e.target.value })}
@@ -181,7 +208,7 @@ export default function CreateArticlePage() {
               </div>
             </div>
 
-            {(formData.category && (formData.seoUrlTitle || formData.title)) && (
+            {formData.category && (formData.seoUrlTitle || formData.title) && (
               <p className="text-xs text-slate-500">
                 Preview URL: <span className="font-mono text-slate-700">{getArticleUrl({
                   category: formData.category,
@@ -201,12 +228,11 @@ export default function CreateArticlePage() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
                   {categories.length > 0 ? (
-                    categories.map(cat => (
+                    categories.map((cat) => (
                       <option key={cat._id} value={cat.slug}>{cat.name}</option>
                     ))
                   ) : (
-                    // Fallback if API unavailable
-                    ['politics','business','technology','sports','entertainment','health','crime'].map(s => (
+                    ['politics', 'business', 'technology', 'sports', 'entertainment', 'health', 'crime'].map((s) => (
                       <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
                     ))
                   )}
@@ -234,7 +260,7 @@ export default function CreateArticlePage() {
               <label className="block text-xs font-black uppercase text-slate-400 mb-2">Article Content</label>
               <RichTextEditor
                 value={formData.content}
-                onChange={(html) => setFormData(prev => ({ ...prev, content: html }))}
+                onChange={(html) => setFormData((prev) => ({ ...prev, content: html }))}
                 placeholder="Start writing your story..."
                 onImageUpload={uploadImage}
               />
@@ -253,7 +279,7 @@ export default function CreateArticlePage() {
                 disabled={submitLoading || uploading}
                 className="flex-1 bg-red-700 text-white font-black py-3 sm:py-4 rounded-xl hover:bg-red-800 transition-all shadow-xl shadow-red-700/20 uppercase text-xs tracking-widest disabled:opacity-50"
               >
-                {submitLoading ? 'Submitting...' : 'Submit for Review'}
+                {submitLoading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </form>

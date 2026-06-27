@@ -7,7 +7,7 @@ import CategorySection from "./components/CategorySection";
 import Sidebar from "./components/Sidebar";
 import NewsCard from "./components/NewsCard";
 import Footer from "./components/Footer";
-import { getImageUrl } from "../lib/utils";
+import { getImageUrl, getArticleUrl } from "../lib/utils";
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +37,7 @@ const mapArticle = (article) => ({
   date: new Date(article.createdAt).toLocaleDateString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric'
   }),
+  url: getArticleUrl(article),
 });
 
 export default async function HomePage() {
@@ -137,6 +138,7 @@ export default async function HomePage() {
                     category={article.badge}
                     categoryType={article.badgeType}
                     time={article.time}
+                    url={article.url}
                   />
                 ))}
               </div>

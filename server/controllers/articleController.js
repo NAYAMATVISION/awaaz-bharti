@@ -7,7 +7,7 @@ import Article from '../models/Article.js';
  */
 export const createArticle = async (req, res) => {
   try {
-    const { title, subheading, content, image, category } = req.body;
+    const { title, subheading, content, image, category, subCategory, seoUrlTitle } = req.body;
 
     const article = new Article({
       title,
@@ -15,6 +15,8 @@ export const createArticle = async (req, res) => {
       content,
       image,
       category: category?.toLowerCase(),
+      ...(subCategory ? { subCategory } : {}),
+      ...(seoUrlTitle ? { seoUrlTitle } : {}),
       author: req.user._id,
       createdBy: req.user._id,
       status: 'pending',
@@ -205,7 +207,19 @@ export const rejectArticle = async (req, res) => {
  */
 export const updateArticle = async (req, res) => {
   try {
-    const { status, isBreaking, isFeatured, isActive } = req.body;
+    const {
+      status,
+      isBreaking,
+      isFeatured,
+      isActive,
+      title,
+      subheading,
+      content,
+      image,
+      category,
+      subCategory,
+      seoUrlTitle,
+    } = req.body;
     const article = await Article.findById(req.params.id);
 
     if (!article) {
@@ -216,6 +230,47 @@ export const updateArticle = async (req, res) => {
     if (isBreaking !== undefined) article.isBreaking = isBreaking;
     if (isFeatured !== undefined) article.isFeatured = isFeatured;
     if (isActive !== undefined) article.isActive = isActive;
+    if (title !== undefined) article.title = title;
+    if (subheading !== undefined) article.subheading = subheading;
+    if (content !== undefined) article.content = content;
+    if (image !== undefined) article.image = image;
+    if (category !== undefined) article.category = category.toLowerCase();
+    if (subCategory !== undefined) article.subCategory = subCategory;
+    if (seoUrlTitle !== undefined) article.seoUrlTitle = seoUrlTitle;
+
+    const updatedArticle = await article.save();
+    res.json({ success: true, data: updatedArticle });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * @desc    Update own article (Employee)
+ * @route   PUT /api/articles/:id/me
+ * @access  Private (Employee)
+ */
+export const updateMyArticle = async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id);
+    if (!article) {
+      return res.status(404).json({ success: false, message: 'Article not found' });
+    }
+    if (article.createdBy?.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized to edit this article' });
+    }
+    if (article.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Only pending articles can be edited' });
+    }
+
+    const { title, subheading, content, image, category, subCategory, seoUrlTitle } = req.body;
+    if (title !== undefined) article.title = title;
+    if (subheading !== undefined) article.subheading = subheading;
+    if (content !== undefined) article.content = content;
+    if (image !== undefined) article.image = image;
+    if (category !== undefined) article.category = category.toLowerCase();
+    if (subCategory !== undefined) article.subCategory = subCategory;
+    if (seoUrlTitle !== undefined) article.seoUrlTitle = seoUrlTitle;
 
     const updatedArticle = await article.save();
     res.json({ success: true, data: updatedArticle });

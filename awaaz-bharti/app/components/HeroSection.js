@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Badge from "./Badge";
 import Link from "next/link";
-import { getImageUrl } from "../../lib/utils";
+import { getImageUrl, getArticleUrl } from "../../lib/utils";
 
 export default function HeroSection({ featured }) {
   return (
     <section className="py-3 pb-2">
       <Link
-        href={`/article/${featured.id}`}
+        href={featured.url || `/article/${featured.id}`}
         target="_blank"
         className="relative rounded-xl overflow-hidden cursor-pointer group min-h-[200px] sm:min-h-[300px] md:min-h-[420px] block"
       >

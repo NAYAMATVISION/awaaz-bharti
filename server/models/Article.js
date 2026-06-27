@@ -18,6 +18,12 @@ const articleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    subCategory: {
+      type: String,
+    },
+    seoUrlTitle: {
+      type: String,
+    },
     image: {
       type: String,
       required: true,

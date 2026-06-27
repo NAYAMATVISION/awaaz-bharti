@@ -29,6 +29,7 @@ export default function NewsCard({
   description,
   isSmall = false,
   isFeatured = false,
+  url,
 }) {
   const cardContent = (
     <>
@@ -97,7 +98,7 @@ export default function NewsCard({
 
   return (
     <Link 
-      href={`/article/${id}`} 
+      href={url || `/article/${id}`} 
       target="_blank" 
       className="block cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-[1px]"
     >

@@ -1,6 +1,7 @@
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import NewsCard from "../../components/NewsCard";
+import { getArticleUrl } from "../../../lib/utils";
 
 export async function generateMetadata({ params }) {
   const { category } = await params;
@@ -38,6 +39,7 @@ const mapArticle = (article) => ({
   time: new Date(article.createdAt).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric'
   }),
+  url: getArticleUrl(article),
 });
 
 export default async function CategoryPage({ params }) {
@@ -81,6 +83,7 @@ export default async function CategoryPage({ params }) {
                   categoryType={article.badgeType}
                   time={article.time}
                   description={article.description}
+                  url={article.url}
                   isSmall={false}
                 />
               </div>

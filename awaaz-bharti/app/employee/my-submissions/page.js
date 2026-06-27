@@ -135,12 +135,20 @@ export default function EmployeeSubmissionsPage() {
                         <StatusBadge status={article.status} />
                       </div>
                       {article.status === 'pending' && (
-                        <button
-                          onClick={() => handleDelete('article', article._id)}
-                          className="mt-2 text-[10px] font-black text-red-400 hover:text-red-700 uppercase tracking-widest transition-all"
-                        >
-                          Delete
-                        </button>
+                        <div className="mt-2 flex gap-3">
+                          <button
+                            onClick={() => router.push(`/employee/edit-article/${article._id}`)}
+                            className="text-[10px] font-black text-slate-500 hover:text-slate-900 uppercase tracking-widest transition-all"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete('article', article._id)}
+                            className="text-[10px] font-black text-red-400 hover:text-red-700 uppercase tracking-widest transition-all"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       )}
                     </div>
                   ))
