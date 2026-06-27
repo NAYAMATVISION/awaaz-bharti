@@ -23,12 +23,16 @@ export default function EditArticlePage() {
     image: '',
     content: ''
   });
+  const [articleStatus, setArticleStatus] = useState(null);
+  const [hasPendingEdit, setHasPendingEdit] = useState(false);
   const [categories, setCategories] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
+
+  const isPublishedEdit = articleStatus === 'approved';
 
   useEffect(() => {
     if (!loading && (!user || (user.role !== 'employee' && user.role !== 'admin'))) {
@@ -59,15 +63,23 @@ export default function EditArticlePage() {
         if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load article');
         const article = data.data.find((a) => a._id === id);
         if (!article) throw new Error('Article not found');
-        if (article.status !== 'pending') throw new Error('Only pending articles can be edited');
+
+        const editable = article.status === 'pending' || article.status === 'approved' || article.status === 'rejected';
+        if (!editable) throw new Error('This article cannot be edited');
+
+        setArticleStatus(article.status);
+        const pending = article.pendingChanges?.submittedAt;
+        setHasPendingEdit(!!pending);
+
+        const source = pending ? article.pendingChanges : article;
         setFormData({
-          title: article.title || '',
-          subheading: article.subheading || '',
-          category: article.category || '',
-          subCategory: article.subCategory || '',
-          seoUrlTitle: article.seoUrlTitle || '',
-          image: article.image || '',
-          content: article.content || '',
+          title: source.title || article.title || '',
+          subheading: source.subheading || article.subheading || '',
+          category: source.category || article.category || '',
+          subCategory: source.subCategory || article.subCategory || '',
+          seoUrlTitle: source.seoUrlTitle || article.seoUrlTitle || '',
+          image: source.image || article.image || '',
+          content: source.content || article.content || '',
         });
       } catch (err) {
         setError(err.message);
@@ -122,14 +134,18 @@ export default function EditArticlePage() {
     try {
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const body = isPublishedEdit
+        ? { ...formData, submitForApproval: true }
+        : formData;
+
       const res = await fetch(`${apiUrl}/api/articles/${id}/me`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to update article');
-      alert('Article updated successfully');
+      alert(isPublishedEdit ? 'Edits submitted for approval' : 'Article updated successfully');
       router.push('/employee/my-submissions');
     } catch (err) {
       setError(err.message);
@@ -154,7 +170,16 @@ export default function EditArticlePage() {
         <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 shadow-xl border border-slate-100">
           <div className="mb-6 sm:mb-10">
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Edit Article</h1>
-            <p className="text-slate-500 mt-2">Update your pending submission.</p>
+            <p className="text-slate-500 mt-2">
+              {isPublishedEdit
+                ? 'Edit your published article. The live version stays unchanged until an admin approves your changes.'
+                : 'Update your pending submission.'}
+            </p>
+            {isPublishedEdit && hasPendingEdit && (
+              <p className="mt-2 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 inline-block">
+                You have edits pending review. Submitting again will replace them.
+              </p>
+            )}
           </div>
 
           {error && (
@@ -279,7 +304,11 @@ export default function EditArticlePage() {
                 disabled={submitLoading || uploading}
                 className="flex-1 bg-red-700 text-white font-black py-3 sm:py-4 rounded-xl hover:bg-red-800 transition-all shadow-xl shadow-red-700/20 uppercase text-xs tracking-widest disabled:opacity-50"
               >
-                {submitLoading ? 'Saving...' : 'Save Changes'}
+                {submitLoading
+                  ? 'Submitting...'
+                  : isPublishedEdit
+                  ? 'Submit for Approval'
+                  : 'Save Changes'}
               </button>
             </div>
           </form>

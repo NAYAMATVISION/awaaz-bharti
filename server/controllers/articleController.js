@@ -1,5 +1,26 @@
 import Article from '../models/Article.js';
 
+const hasPendingEdit = (article) =>
+  article.pendingChanges && article.pendingChanges.submittedAt;
+
+const buildPreviewArticle = (article) => {
+  const base = article.toObject ? article.toObject() : { ...article };
+  if (hasPendingEdit(article)) {
+    const pc = article.pendingChanges;
+    return {
+      ...base,
+      title: pc.title ?? base.title,
+      subheading: pc.subheading ?? base.subheading,
+      content: pc.content ?? base.content,
+      image: pc.image ?? base.image,
+      category: pc.category ?? base.category,
+      subCategory: pc.subCategory ?? base.subCategory,
+      seoUrlTitle: pc.seoUrlTitle ?? base.seoUrlTitle,
+    };
+  }
+  return base;
+};
+
 /**
  * @desc    Create a new article
  * @route   POST /api/articles
@@ -153,11 +174,24 @@ export const approveArticle = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Article not found' });
     }
 
-    if (article.status === 'approved') {
+    if (hasPendingEdit(article)) {
+      const pc = article.pendingChanges;
+      if (pc.title !== undefined) article.title = pc.title;
+      if (pc.subheading !== undefined) article.subheading = pc.subheading;
+      if (pc.content !== undefined) article.content = pc.content;
+      if (pc.image !== undefined) article.image = pc.image;
+      if (pc.category !== undefined) article.category = pc.category;
+      if (pc.subCategory !== undefined) article.subCategory = pc.subCategory;
+      if (pc.seoUrlTitle !== undefined) article.seoUrlTitle = pc.seoUrlTitle;
+      article.pendingChanges = undefined;
+      article.markModified('pendingChanges');
+      article.status = 'approved';
+    } else if (article.status === 'approved') {
       return res.status(400).json({ success: false, message: 'Article is already approved' });
+    } else {
+      article.status = 'approved';
     }
 
-    article.status = 'approved';
     const updatedArticle = await article.save();
 
     res.json({
@@ -181,6 +215,17 @@ export const rejectArticle = async (req, res) => {
 
     if (!article) {
       return res.status(404).json({ success: false, message: 'Article not found' });
+    }
+
+    if (hasPendingEdit(article)) {
+      article.pendingChanges = undefined;
+      article.markModified('pendingChanges');
+      const updatedArticle = await article.save();
+      return res.json({
+        success: true,
+        message: 'Pending edits rejected. Published version unchanged.',
+        data: updatedArticle
+      });
     }
 
     if (article.status === 'rejected') {
@@ -259,11 +304,35 @@ export const updateMyArticle = async (req, res) => {
     if (article.createdBy?.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: 'Not authorized to edit this article' });
     }
-    if (article.status !== 'pending') {
-      return res.status(400).json({ success: false, message: 'Only pending articles can be edited' });
+
+    const { title, subheading, content, image, category, subCategory, seoUrlTitle, submitForApproval } = req.body;
+
+    if (article.status === 'approved') {
+      if (!submitForApproval) {
+        return res.status(400).json({ success: false, message: 'Published articles must be submitted for approval' });
+      }
+      article.pendingChanges = {
+        title,
+        subheading,
+        content,
+        image,
+        category: category?.toLowerCase(),
+        subCategory,
+        seoUrlTitle,
+        submittedAt: new Date(),
+      };
+      const updatedArticle = await article.save();
+      return res.json({
+        success: true,
+        message: 'Edits submitted for approval',
+        data: updatedArticle,
+      });
     }
 
-    const { title, subheading, content, image, category, subCategory, seoUrlTitle } = req.body;
+    if (article.status !== 'pending' && article.status !== 'rejected') {
+      return res.status(400).json({ success: false, message: 'This article cannot be edited' });
+    }
+
     if (title !== undefined) article.title = title;
     if (subheading !== undefined) article.subheading = subheading;
     if (content !== undefined) article.content = content;
@@ -271,6 +340,7 @@ export const updateMyArticle = async (req, res) => {
     if (category !== undefined) article.category = category.toLowerCase();
     if (subCategory !== undefined) article.subCategory = subCategory;
     if (seoUrlTitle !== undefined) article.seoUrlTitle = seoUrlTitle;
+    if (article.status === 'rejected') article.status = 'pending';
 
     const updatedArticle = await article.save();
     res.json({ success: true, data: updatedArticle });
@@ -379,6 +449,34 @@ export const setTrendingOrder = async (req, res) => {
  * @route   GET /api/articles/:id
  * @access  Public
  */
+/**
+ * @desc    Preview pending article or pending edits (Admin Only)
+ * @route   GET /api/articles/:id/admin
+ * @access  Private (Admin)
+ */
+export const getAdminArticlePreview = async (req, res) => {
+  try {
+    const mongoose = (await import('mongoose')).default;
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid Article ID' });
+    }
+
+    const article = await Article.findById(req.params.id).populate('author', 'name email');
+    if (!article) {
+      return res.status(404).json({ success: false, message: 'Article not found' });
+    }
+
+    const canPreview = article.status === 'pending' || hasPendingEdit(article);
+    if (!canPreview) {
+      return res.status(400).json({ success: false, message: 'No pending version to preview' });
+    }
+
+    res.json({ success: true, data: buildPreviewArticle(article) });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const getArticleById = async (req, res) => {
   try {
     const mongoose = (await import('mongoose')).default;

@@ -180,15 +180,26 @@ export default function EmployeeDashboard() {
                     <p className="text-sm text-slate-400 italic">No article submissions yet.</p>
                   ) : (
                     articles.map(article => (
-                      <div key={article._id} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100">
-                        <span className="font-bold text-sm text-gray-900 truncate pr-4">{article.title}</span>
-                        <span className={`text-[10px] px-2 py-1 rounded font-black uppercase tracking-wider ${
-                          article.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                          article.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-amber-100 text-amber-700'
-                        }`}>
-                          {article.status}
-                        </span>
+                      <div key={article._id} className="bg-white p-3 rounded-xl border border-slate-100">
+                        <div className="flex justify-between items-center gap-2">
+                          <span className="font-bold text-sm text-gray-900 truncate">{article.title}</span>
+                          <span className={`text-[10px] px-2 py-1 rounded font-black uppercase tracking-wider shrink-0 ${
+                            article.status === 'approved' && article.pendingChanges?.submittedAt ? 'bg-amber-100 text-amber-700' :
+                            article.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                            article.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            'bg-amber-100 text-amber-700'
+                          }`}>
+                            {article.status === 'approved' && article.pendingChanges?.submittedAt ? 'Pending Review' : article.status}
+                          </span>
+                        </div>
+                        {(article.status === 'pending' || article.status === 'approved') && (
+                          <button
+                            onClick={() => router.push(`/employee/edit-article/${article._id}`)}
+                            className="mt-2 text-[10px] font-black text-slate-500 hover:text-slate-900 uppercase tracking-widest transition-all"
+                          >
+                            Edit
+                          </button>
+                        )}
                       </div>
                     ))
                   )}

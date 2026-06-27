@@ -6,7 +6,15 @@ import { useAuthContext } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
-const StatusBadge = ({ status }) => {
+const StatusBadge = ({ status, pendingChanges }) => {
+  if (status === 'approved' && pendingChanges?.submittedAt) {
+    return (
+      <span className="text-[10px] px-2 py-1 rounded font-black uppercase tracking-wider bg-amber-100 text-amber-700">
+        Pending Review
+      </span>
+    );
+  }
+
   const classes = status === 'approved'
     ? 'bg-emerald-100 text-emerald-700'
     : status === 'rejected'
@@ -132,9 +140,9 @@ export default function EmployeeSubmissionsPage() {
                           <p className="font-bold text-sm text-gray-900 line-clamp-2">{article.title}</p>
                           <p className="text-[11px] text-slate-500 mt-1">{new Date(article.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <StatusBadge status={article.status} />
+                        <StatusBadge status={article.status} pendingChanges={article.pendingChanges} />
                       </div>
-                      {article.status === 'pending' && (
+                      {(article.status === 'pending' || article.status === 'rejected') && (
                         <div className="mt-2 flex gap-3">
                           <button
                             onClick={() => router.push(`/employee/edit-article/${article._id}`)}
@@ -142,11 +150,23 @@ export default function EmployeeSubmissionsPage() {
                           >
                             Edit
                           </button>
+                          {article.status === 'pending' && (
+                            <button
+                              onClick={() => handleDelete('article', article._id)}
+                              className="text-[10px] font-black text-red-400 hover:text-red-700 uppercase tracking-widest transition-all"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      {article.status === 'approved' && (
+                        <div className="mt-2">
                           <button
-                            onClick={() => handleDelete('article', article._id)}
-                            className="text-[10px] font-black text-red-400 hover:text-red-700 uppercase tracking-widest transition-all"
+                            onClick={() => router.push(`/employee/edit-article/${article._id}`)}
+                            className="text-[10px] font-black text-slate-500 hover:text-slate-900 uppercase tracking-widest transition-all"
                           >
-                            Delete
+                            Edit
                           </button>
                         </div>
                       )}

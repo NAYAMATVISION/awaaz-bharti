@@ -10,6 +10,7 @@ import {
   approveArticle, 
   rejectArticle,
   getArticleById,
+  getAdminArticlePreview,
   updateArticle,
   deleteArticle,
   deleteMyArticle,
@@ -32,6 +33,7 @@ router.get('/search', searchArticles);
 // Protected routes (above dynamic :id)
 router.get('/all', protect, adminOnly, getAdminArticles);
 router.get('/me', protect, getMyArticles);
+router.get('/:id/admin', protect, adminOnly, getAdminArticlePreview);
 router.post('/', protect, employeeOnly, createArticle);
 router.put('/:id', protect, adminOnly, updateArticle);
 router.put('/:id/approve', protect, adminOnly, approveArticle);

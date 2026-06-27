@@ -62,6 +62,16 @@ const articleSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    pendingChanges: {
+      title: String,
+      subheading: String,
+      content: String,
+      image: String,
+      category: String,
+      subCategory: String,
+      seoUrlTitle: String,
+      submittedAt: Date,
+    },
   },
   {
     timestamps: true,

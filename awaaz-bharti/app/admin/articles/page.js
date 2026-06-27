@@ -59,6 +59,37 @@ export default function AdminArticlesPage() {
     }
   };
 
+  const approveArticle = async (articleId) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${apiUrl}/api/articles/${articleId}/approve`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (res.ok) fetchArticles();
+    } catch (err) {
+      console.error('Error approving article:', err);
+    }
+  };
+
+  const rejectArticle = async (articleId) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${apiUrl}/api/articles/${articleId}/reject`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (res.ok) fetchArticles();
+    } catch (err) {
+      console.error('Error rejecting article:', err);
+    }
+  };
+
+  const isPendingReview = (art) =>
+    art.status === 'pending' || (art.pendingChanges && art.pendingChanges.submittedAt);
+
   const deleteArticle = async (articleId) => {
     if (!confirm('Permanently delete this article?')) return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -191,13 +222,20 @@ export default function AdminArticlesPage() {
                         </td>
 
                         <td className="py-4 px-2">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                            art.status === 'approved' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
-                            art.status === 'rejected' ? 'bg-red-100 text-red-700 border border-red-200' :
-                            'bg-amber-100 text-amber-700 border border-amber-200'
-                          }`}>
-                            {art.status}
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit ${
+                              art.status === 'approved' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
+                              art.status === 'rejected' ? 'bg-red-100 text-red-700 border border-red-200' :
+                              'bg-amber-100 text-amber-700 border border-amber-200'
+                            }`}>
+                              {art.status}
+                            </span>
+                            {art.status === 'approved' && art.pendingChanges?.submittedAt && (
+                              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit bg-amber-100 text-amber-700 border border-amber-200">
+                                Edit Pending
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         <td className="py-4 px-2">
@@ -259,16 +297,22 @@ export default function AdminArticlesPage() {
 
                         <td className="py-4 px-2 text-right">
                           <div className="flex flex-col gap-1.5 items-end">
-                            {art.status === 'pending' ? (
-                              <div className="flex gap-2">
+                            {isPendingReview(art) ? (
+                              <div className="flex flex-wrap gap-2 justify-end">
                                 <button
-                                  onClick={() => updateArticle(art._id, { status: 'approved' })}
+                                  onClick={() => router.push(`/admin/articles/preview/${art._id}`)}
+                                  className="text-[10px] font-black text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-all uppercase tracking-widest"
+                                >
+                                  Preview
+                                </button>
+                                <button
+                                  onClick={() => approveArticle(art._id)}
                                   className="text-[10px] font-black text-white bg-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition-all uppercase tracking-widest"
                                 >
                                   Approve
                                 </button>
                                 <button
-                                  onClick={() => updateArticle(art._id, { status: 'rejected' })}
+                                  onClick={() => rejectArticle(art._id)}
                                   className="text-[10px] font-black text-white bg-red-600 px-3 py-1.5 rounded-lg hover:bg-red-700 transition-all uppercase tracking-widest"
                                 >
                                   Reject
